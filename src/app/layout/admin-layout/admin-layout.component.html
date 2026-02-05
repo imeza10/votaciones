@@ -1,0 +1,96 @@
+<div class="admin-layout" [class.sidebar-collapsed]="!sidebarOpen()">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <button class="menu-toggle" (click)="toggleSidebar()">
+        <i class="pi pi-bars"></i>
+      </button>
+      <div class="logo">
+        <span class="flag">🇨🇴</span>
+        <span class="title">Sistema Electoral</span>
+      </div>
+    </div>
+    
+    <div class="header-right">
+      <div class="user-info">
+        <span class="user-name">{{ currentUser()?.nombre }} {{ currentUser()?.apellidos }}</span>
+        <span class="user-role">{{ currentUser()?.rol }}</span>
+      </div>
+      <button class="btn-logout" (click)="logout()" title="Cerrar sesión">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.open]="sidebarOpen()">
+    <nav class="nav-menu">
+      <a routerLink="/dashboard" routerLinkActive="active" class="nav-item">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Gestión</div>
+        
+        <a routerLink="/votantes" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-users"></i>
+          <span>Votantes</span>
+        </a>
+
+        <a routerLink="/usuarios" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-user"></i>
+          <span>Usuarios</span>
+        </a>
+
+        <a routerLink="/puestos-control" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-map-marker"></i>
+          <span>Puestos de Control</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Operaciones</div>
+        
+        <a routerLink="/confirmacion-votos" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-check-circle"></i>
+          <span>Confirmación de Votos</span>
+        </a>
+
+        <a routerLink="/mensajes" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-send"></i>
+          <span>Mensajes</span>
+        </a>
+
+        <a routerLink="/transportes" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-car"></i>
+          <span>Transportes</span>
+        </a>
+
+        <a routerLink="/gastos" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-dollar"></i>
+          <span>Gastos</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Reportes</div>
+        
+        <a routerLink="/reportes" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-file"></i>
+          <span>Reportes</span>
+        </a>
+
+        <a routerLink="/estadisticas" routerLinkActive="active" class="nav-item">
+          <i class="pi pi-chart-bar"></i>
+          <span>Estadísticas</span>
+        </a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

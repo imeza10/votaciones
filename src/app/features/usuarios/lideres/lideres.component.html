@@ -1,0 +1,329 @@
+<div class="lideres-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Gestión de Líderes</h1>
+      <p class="subtitle">Administra los líderes de votantes del sistema</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <i class="icon">➕</i>
+      Nuevo Líder
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label>Buscar</label>
+        <input 
+          type="text" 
+          class="form-control"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          placeholder="Documento, nombre, apellidos..."
+        />
+      </div>
+
+      <div class="filter-group">
+        <label>Coordinador</label>
+        <select 
+          class="form-control"
+          [(ngModel)]="filterCoordinador"
+          (change)="onFilterChange()"
+        >
+          <option value="">Todos los coordinadores</option>
+          <option *ngFor="let coord of coordinadores()" [value]="coord.id">
+            {{ coord.nombre }} {{ coord.apellidos }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>Estado</label>
+        <select 
+          class="form-control"
+          [(ngModel)]="filterActivo"
+          (change)="onFilterChange()"
+        >
+          <option value="">Todos</option>
+          <option value="1">Activos</option>
+          <option value="0">Inactivos</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label>&nbsp;</label>
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          Limpiar Filtros
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="table-card">
+    <div *ngIf="loading()" class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Cargando...</p>
+    </div>
+
+    <div *ngIf="!loading() && lideres().length === 0" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <h3>No hay líderes registrados</h3>
+      <p>Comienza agregando tu primer líder</p>
+      <button class="btn btn-primary" (click)="openCreateModal()">
+        Crear Primer Líder
+      </button>
+    </div>
+
+    <div *ngIf="!loading() && lideres().length > 0" class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Documento</th>
+            <th>Nombre Completo</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Coordinador</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lider of lideres()">
+            <td>{{ lider.documento }}</td>
+            <td>{{ lider.nombre }} {{ lider.apellidos }}</td>
+            <td>{{ lider.telefono || '-' }}</td>
+            <td>{{ lider.email || '-' }}</td>
+            <td>
+              <span *ngIf="lider.coordinador_id">{{ lider.coordinador_nombre }}</span>
+              <span *ngIf="!lider.coordinador_id" class="text-muted">Sin asignar</span>
+            </td>
+            <td>
+              <span 
+                class="badge" 
+                [ngClass]="getEstadoBadgeClass(lider.activo)"
+              >
+                {{ getEstadoText(lider.activo) }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button 
+                  class="btn-icon btn-edit" 
+                  (click)="openEditModal(lider)"
+                  title="Editar"
+                >
+                  ✏️
+                </button>
+                <button 
+                  class="btn-icon btn-toggle" 
+                  (click)="cambiarEstado(lider)"
+                  [title]="lider.activo ? 'Desactivar' : 'Activar'"
+                >
+                  {{ lider.activo ? '🔒' : '🔓' }}
+                </button>
+                <button 
+                  class="btn-icon btn-delete" 
+                  (click)="openDeleteModal(lider)"
+                  title="Eliminar"
+                >
+                  🗑️
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="!loading() && lideres().length > 0" class="pagination">
+      <div class="pagination-info">
+        Mostrando {{ (currentPage - 1) * perPage + 1 }} - 
+        {{ Math.min(currentPage * perPage, totalRecords) }} de {{ totalRecords }} líderes
+      </div>
+      <div class="pagination-buttons">
+        <button 
+          class="btn btn-sm"
+          [disabled]="currentPage === 1"
+          (click)="onPageChange(currentPage - 1)"
+        >
+          Anterior
+        </button>
+        <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button 
+          class="btn btn-sm"
+          [disabled]="currentPage === totalPages"
+          (click)="onPageChange(currentPage + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Crear/Editar -->
+  <div class="modal-overlay" *ngIf="showModal()" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ modalMode === 'crear' ? 'Nuevo Líder' : 'Editar Líder' }}</h2>
+        <button class="btn-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <form [formGroup]="liderForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div *ngIf="formErrors.length > 0" class="alert alert-error">
+            <ul>
+              <li *ngFor="let error of formErrors">{{ error }}</li>
+            </ul>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre *</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="nombre"
+                placeholder="Nombre del líder"
+              />
+              <span class="error" *ngIf="liderForm.get('nombre')?.invalid && liderForm.get('nombre')?.touched">
+                El nombre es requerido
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label>Apellidos *</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="apellidos"
+                placeholder="Apellidos del líder"
+              />
+              <span class="error" *ngIf="liderForm.get('apellidos')?.invalid && liderForm.get('apellidos')?.touched">
+                Los apellidos son requeridos
+              </span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Documento *</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="documento"
+                placeholder="Número de documento"
+              />
+              <span class="error" *ngIf="liderForm.get('documento')?.invalid && liderForm.get('documento')?.touched">
+                Documento inválido (6-10 dígitos)
+              </span>
+            </div>
+
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input 
+                type="text" 
+                class="form-control"
+                formControlName="telefono"
+                placeholder="3001234567"
+              />
+              <span class="error" *ngIf="liderForm.get('telefono')?.invalid && liderForm.get('telefono')?.touched">
+                Teléfono inválido (10 dígitos)
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input 
+              type="email" 
+              class="form-control"
+              formControlName="email"
+              placeholder="correo@ejemplo.com"
+            />
+            <span class="error" *ngIf="liderForm.get('email')?.invalid && liderForm.get('email')?.touched">
+              Email inválido
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Coordinador *</label>
+            <select class="form-control" formControlName="coordinador_id">
+              <option value="">Seleccione un coordinador</option>
+              <option *ngFor="let coord of coordinadores()" [value]="coord.id">
+                {{ coord.nombre }} {{ coord.apellidos }}
+              </option>
+            </select>
+            <span class="error" *ngIf="liderForm.get('coordinador_id')?.invalid && liderForm.get('coordinador_id')?.touched">
+              El coordinador es requerido
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>{{ modalMode === 'crear' ? 'Contraseña *' : 'Nueva Contraseña (dejar vacío para mantener)' }}</label>
+            <input 
+              type="password" 
+              class="form-control"
+              formControlName="password"
+              placeholder="Mínimo 6 caracteres"
+            />
+            <span class="error" *ngIf="liderForm.get('password')?.invalid && liderForm.get('password')?.touched">
+              Contraseña inválida (mínimo 6 caracteres)
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="activo" />
+              Líder activo
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading()">
+            {{ loading() ? 'Guardando...' : (modalMode === 'crear' ? 'Crear Líder' : 'Actualizar') }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Eliminar -->
+  <div class="modal-overlay" *ngIf="showDeleteModal()" (click)="closeDeleteModal()">
+    <div class="modal-content modal-confirm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirmar Eliminación</h2>
+        <button class="btn-close" (click)="closeDeleteModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="confirm-icon">⚠️</div>
+        <p>¿Está seguro que desea eliminar este líder?</p>
+        <p class="confirm-name">
+          <strong>{{ selectedLider?.nombre }} {{ selectedLider?.apellidos }}</strong>
+          <br>
+          <small>{{ selectedLider?.documento }}</small>
+        </p>
+        <div class="alert alert-warning">
+          Esta acción no se puede deshacer.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">
+          Cancelar
+        </button>
+        <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="loading()">
+          {{ loading() ? 'Eliminando...' : 'Sí, Eliminar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

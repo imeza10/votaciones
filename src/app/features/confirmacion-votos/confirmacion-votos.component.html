@@ -1,0 +1,276 @@
+<div class="confirmacion-container">
+  <!-- Header con Estadísticas -->
+  <div class="header-section">
+    <h1>
+      <i class="icon-check"></i> Confirmación de Votos
+    </h1>
+    
+    <div class="stats-cards" *ngIf="estadisticas">
+      <div class="stat-card">
+        <div class="stat-value">{{ estadisticas.resumen.total_votantes }}</div>
+        <div class="stat-label">Total Votantes</div>
+      </div>
+      
+      <div class="stat-card success">
+        <div class="stat-value">{{ estadisticas.resumen.total_confirmados }}</div>
+        <div class="stat-label">Confirmados</div>
+        <div class="stat-percent">{{ estadisticas.resumen.porcentaje_confirmacion }}%</div>
+      </div>
+      
+      <div class="stat-card warning">
+        <div class="stat-value">{{ estadisticas.resumen.pendientes }}</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      
+      <div class="stat-card primary">
+        <div class="stat-value">{{ estadisticas.resumen.votos_favor }}</div>
+        <div class="stat-label">Votos a Favor</div>
+        <div class="stat-percent" *ngIf="estadisticas.resumen.total_confirmados > 0">
+          {{ estadisticas.resumen.porcentaje_favor }}%
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs de Vista -->
+  <div class="tabs">
+    <button 
+      class="tab" 
+      [class.active]="vistaActual === 'pendientes'"
+      (click)="cambiarVista('pendientes')">
+      <i class="icon-clock"></i> Pendientes
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="vistaActual === 'confirmados'"
+      (click)="cambiarVista('confirmados')">
+      <i class="icon-check"></i> Confirmados
+    </button>
+    <button 
+      class="tab" 
+      [class.active]="vistaActual === 'todos'"
+      (click)="cambiarVista('todos')">
+      <i class="icon-list"></i> Todos
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="icon-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="onSearchChange()"
+        placeholder="Buscar por nombre, documento o teléfono..."
+        class="search-input">
+    </div>
+    
+    <div class="filters-grid">
+      <div class="filter-item">
+        <label>Departamento</label>
+        <select [(ngModel)]="filtros.departamento_id" (change)="onDepartamentoChange()">
+          <option value="">Todos</option>
+          <option *ngFor="let dept of departamentos" [value]="dept.id">
+            {{ dept.nombre }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-item">
+        <label>Municipio</label>
+        <select 
+          [(ngModel)]="filtros.municipio_id" 
+          (change)="onMunicipioChange()"
+          [disabled]="!filtros.departamento_id">
+          <option value="">Todos</option>
+          <option *ngFor="let mun of municipios" [value]="mun.id">
+            {{ mun.nombre }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-actions">
+        <button class="btn btn-secondary" (click)="limpiarFiltros()">
+          <i class="icon-refresh"></i> Limpiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de Votantes -->
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Nombre Completo</th>
+          <th>Teléfono</th>
+          <th>Municipio</th>
+          <th>Mesa</th>
+          <th>Líder</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="8" class="text-center">
+            <div class="loading">
+              <div class="spinner"></div>
+              <p>Cargando votantes...</p>
+            </div>
+          </td>
+        </tr>
+        
+        <tr *ngIf="!loading && votantes.length === 0">
+          <td colspan="8" class="text-center">
+            <div class="empty-state">
+              <i class="icon-inbox"></i>
+              <p>No se encontraron votantes</p>
+            </div>
+          </td>
+        </tr>
+        
+        <tr *ngFor="let votante of votantes" [class.confirmed]="votante.confirmado">
+          <td>{{ votante.documento }}</td>
+          <td>
+            <strong>{{ votante.nombres }} {{ votante.apellidos }}</strong>
+          </td>
+          <td>{{ votante.telefono || '-' }}</td>
+          <td>{{ votante.municipio }}</td>
+          <td>{{ votante.mesa || '-' }}</td>
+          <td>{{ votante.lider || '-' }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'badge-success': votante.confirmado && votante.voto,
+              'badge-danger': votante.confirmado && !votante.voto,
+              'badge-warning': !votante.confirmado
+            }">
+              <i [class]="votante.confirmado ? 
+                         (votante.voto ? 'icon-check' : 'icon-x') : 
+                         'icon-clock'"></i>
+              {{ votante.confirmado ? 
+                 (votante.voto ? 'Votó a Favor' : 'No Votó') : 
+                 'Pendiente' }}
+            </span>
+            <small *ngIf="votante.confirmado && votante.hora_confirmacion" class="confirmation-time">
+              {{ votante.hora_confirmacion | date:'short' }}
+            </small>
+          </td>
+          <td>
+            <button 
+              class="btn btn-sm"
+              [ngClass]="votante.confirmado ? 'btn-secondary' : 'btn-primary'"
+              (click)="abrirModalConfirmacion(votante)"
+              [title]="votante.confirmado ? 'Editar confirmación' : 'Confirmar voto'">
+              <i [class]="votante.confirmado ? 'icon-edit' : 'icon-check'"></i>
+              {{ votante.confirmado ? 'Editar' : 'Confirmar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="pagination" *ngIf="pagination.total_pages > 1">
+    <button 
+      class="btn btn-sm btn-secondary" 
+      [disabled]="pagination.current_page === 1"
+      (click)="cambiarPagina(pagination.current_page - 1)">
+      <i class="icon-arrow-left"></i> Anterior
+    </button>
+    
+    <div class="page-numbers">
+      <button 
+        *ngFor="let pagina of getPaginasVisibles()" 
+        class="page-btn"
+        [class.active]="pagina === pagination.current_page"
+        (click)="cambiarPagina(pagina)">
+        {{ pagina }}
+      </button>
+    </div>
+    
+    <button 
+      class="btn btn-sm btn-secondary" 
+      [disabled]="pagination.current_page === pagination.total_pages"
+      (click)="cambiarPagina(pagination.current_page + 1)">
+      Siguiente <i class="icon-arrow-right"></i>
+    </button>
+    
+    <span class="pagination-info">
+      Página {{ pagination.current_page }} de {{ pagination.total_pages }} 
+      ({{ pagination.total }} total)
+    </span>
+  </div>
+</div>
+
+<!-- Modal de Confirmación -->
+<div class="modal-overlay" *ngIf="showConfirmModal" (click)="cerrarModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>
+        <i class="icon-check-circle"></i>
+        {{ votanteAConfirmar?.confirmado ? 'Editar' : 'Confirmar' }} Voto
+      </h2>
+      <button class="close-btn" (click)="cerrarModal()">
+        <i class="icon-x"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body" *ngIf="votanteAConfirmar">
+      <div class="votante-info">
+        <h3>{{ votanteAConfirmar.nombres }} {{ votanteAConfirmar.apellidos }}</h3>
+        <p><strong>Documento:</strong> {{ votanteAConfirmar.documento }}</p>
+        <p><strong>Mesa:</strong> {{ votanteAConfirmar.mesa || 'No asignada' }}</p>
+        <p><strong>Lugar:</strong> {{ votanteAConfirmar.lugar_votacion || 'No asignado' }}</p>
+      </div>
+      
+      <div class="form-group">
+        <label>¿El votante ejerció su derecho al voto?</label>
+        <div class="vote-options">
+          <label class="vote-option" [class.selected]="confirmacionVoto === true">
+            <input 
+              type="radio" 
+              name="voto" 
+              [value]="true" 
+              [(ngModel)]="confirmacionVoto">
+            <span class="vote-label success">
+              <i class="icon-check"></i> Sí, votó a favor
+            </span>
+          </label>
+          
+          <label class="vote-option" [class.selected]="confirmacionVoto === false">
+            <input 
+              type="radio" 
+              name="voto" 
+              [value]="false" 
+              [(ngModel)]="confirmacionVoto">
+            <span class="vote-label danger">
+              <i class="icon-x"></i> No votó
+            </span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>Observaciones (opcional)</label>
+        <textarea 
+          [(ngModel)]="confirmacionObservaciones"
+          placeholder="Agregar notas o comentarios adicionales..."
+          rows="3"></textarea>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="cerrarModal()">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="confirmarVoto()" [disabled]="loading">
+        <i class="icon-save"></i>
+        {{ loading ? 'Guardando...' : 'Confirmar' }}
+      </button>
+    </div>
+  </div>
+</div>

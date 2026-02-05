@@ -1,0 +1,162 @@
+<div class="page-header">
+  <div class="header-content">
+    <h1 class="page-title">Lista de Votantes</h1>
+    <button class="btn-primary" (click)="nuevoVotante()">
+      <i class="icon-plus"></i>
+      Nuevo Votante
+    </button>
+  </div>
+
+  <!-- Barra de búsqueda y filtros -->
+  <div class="search-filters">
+    <div class="search-box">
+      <input 
+        type="text" 
+        placeholder="Buscar por documento, nombres o apellidos..." 
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+      />
+      <i class="icon-search"></i>
+    </div>
+
+    <div class="filters">
+      <select [(ngModel)]="filtros.departamento_id" (change)="onDepartamentoChange()">
+        <option value="">Todos los departamentos</option>
+        <option *ngFor="let dep of departamentos" [value]="dep.id">{{ dep.nombre }}</option>
+      </select>
+
+      <select [(ngModel)]="filtros.municipio_id" (change)="onMunicipioChange()" [disabled]="!filtros.departamento_id">
+        <option value="">Todos los municipios</option>
+        <option *ngFor="let mun of municipios" [value]="mun.id">{{ mun.nombre }}</option>
+      </select>
+
+      <select [(ngModel)]="filtros.voto_confirmado" (change)="aplicarFiltros()">
+        <option value="">Todos los votos</option>
+        <option value="1">Voto confirmado</option>
+        <option value="0">Voto pendiente</option>
+      </select>
+
+      <button class="btn-secondary" (click)="limpiarFiltros()">Limpiar filtros</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tabla de votantes -->
+<div class="table-container">
+  @if (loading) {
+    <app-loading />
+  } @else if (votantes.length === 0) {
+    <div class="empty-state">
+      <i class="icon-users"></i>
+      <h3>No se encontraron votantes</h3>
+      <p>{{ searchTerm || filtros.departamento_id ? 'Intenta ajustar los filtros de búsqueda' : 'Comienza registrando tu primer votante' }}</p>
+      <button class="btn-primary" (click)="nuevoVotante()">Registrar Votante</button>
+    </div>
+  } @else {
+    <table class="votantes-table">
+      <thead>
+        <tr>
+          <th>Documento</th>
+          <th>Nombres</th>
+          <th>Apellidos</th>
+          <th>Teléfono</th>
+          <th>Municipio</th>
+          <th>Líder</th>
+          <th>Voto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (votante of votantes; track votante.id) {
+          <tr>
+            <td>{{ votante.documento }}</td>
+            <td>{{ votante.nombres }}</td>
+            <td>{{ votante.apellidos }}</td>
+            <td>{{ votante.telefono || '-' }}</td>
+            <td>{{ votante.municipio_nombre }}</td>
+            <td>{{ votante.lider_nombres }} {{ votante.lider_apellidos }}</td>
+            <td>
+              <span class="badge" [class.badge-success]="votante.voto_confirmado" [class.badge-warning]="!votante.voto_confirmado">
+                {{ votante.voto_confirmado ? 'Confirmado' : 'Pendiente' }}
+              </span>
+            </td>
+            <td class="actions">
+              <button class="btn-icon btn-view" (click)="verDetalle(votante)" title="Ver detalle">
+                <i class="icon-eye"></i>
+              </button>
+              <button class="btn-icon btn-edit" (click)="editarVotante(votante)" title="Editar">
+                <i class="icon-edit"></i>
+              </button>
+              <button class="btn-icon btn-delete" (click)="confirmarEliminar(votante)" title="Eliminar">
+                <i class="icon-trash"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="pagination">
+      <div class="pagination-info">
+        Mostrando {{ (meta.current_page - 1) * meta.per_page + 1 }} 
+        a {{ Math.min(meta.current_page * meta.per_page, meta.total) }} 
+        de {{ meta.total }} votantes
+      </div>
+      
+      <div class="pagination-controls">
+        <button 
+          class="btn-pagination" 
+          [disabled]="meta.current_page === 1"
+          (click)="cambiarPagina(meta.current_page - 1)"
+        >
+          Anterior
+        </button>
+        
+        <span class="page-numbers">
+          @for (page of getPaginationPages(); track page) {
+            <button 
+              class="btn-page" 
+              [class.active]="page === meta.current_page"
+              (click)="cambiarPagina(page)"
+            >
+              {{ page }}
+            </button>
+          }
+        </span>
+        
+        <button 
+          class="btn-pagination" 
+          [disabled]="meta.current_page === meta.last_page"
+          (click)="cambiarPagina(meta.current_page + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+@if (showDeleteModal) {
+  <div class="modal-overlay" (click)="cancelarEliminar()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirmar Eliminación</h3>
+        <button class="btn-close" (click)="cancelarEliminar()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>¿Está seguro que desea eliminar al votante?</p>
+        <div class="votante-info">
+          <strong>{{ votanteAEliminar?.nombres }} {{ votanteAEliminar?.apellidos }}</strong><br>
+          <span>Documento: {{ votanteAEliminar?.documento }}</span>
+        </div>
+        <p class="warning-text">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cancelarEliminar()">Cancelar</button>
+        <button class="btn-danger" (click)="eliminarVotante()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+}

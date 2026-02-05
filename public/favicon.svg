@@ -1,0 +1,13 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- Círculo con bandera de Colombia -->
+  <circle cx="32" cy="32" r="30" fill="#FCD116"/>
+  <path d="M 2 32 A 30 30 0 0 0 62 32 Z" fill="#003893"/>
+  <path d="M 2 40 A 30 30 0 0 0 62 40 Z" fill="#CE1126"/>
+  
+  <!-- Urna de votación -->
+  <rect x="24" y="24" width="16" height="16" rx="2" fill="white" opacity="0.95"/>
+  <rect x="26" y="22" width="12" height="1" fill="#333"/>
+  
+  <!-- Checkmark -->
+  <path d="M 29 32 L 31 34 L 35 28" stroke="#4CAF50" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

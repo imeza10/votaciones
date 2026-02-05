@@ -1,0 +1,5 @@
+@import '../lideres/lideres.component.scss';
+
+.digitadores-container {
+  @extend .lideres-container;
+}

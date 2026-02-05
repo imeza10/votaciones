@@ -1,0 +1,9 @@
+// Reutilizar los estilos del formulario de registro
+@import '../registro/registro.component.scss';
+
+// Estilos específicos para editar si son necesarios
+.page-header {
+  h1 {
+    color: var(--colombia-yellow);
+  }
+}

@@ -1,0 +1,109 @@
+<div class="dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1>Dashboard Electoral</h1>
+      <p class="subtitle">Resumen general del sistema</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh">
+        <i class="pi pi-refresh"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Tarjetas de Estadísticas -->
+  <div class="stats-grid">
+    @for (stat of estadisticas(); track stat.titulo) {
+      <div class="stat-card" [class]="'stat-' + stat.color">
+        <div class="stat-icon">
+          <i class="pi" [class]="stat.icono"></i>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">{{ stat.valor | number }}</div>
+          <div class="stat-title">{{ stat.titulo }}</div>
+          @if (stat.cambio) {
+            <div class="stat-change">{{ stat.cambio }}</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Grid de contenido -->
+  <div class="content-grid">
+    <!-- Actividad Reciente -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <i class="pi pi-clock"></i>
+          Actividad Reciente
+        </h3>
+      </div>
+      <div class="card-content">
+        @if (actividadReciente().length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>No hay actividad reciente</p>
+          </div>
+        } @else {
+          <div class="activity-list">
+            @for (actividad of actividadReciente(); track actividad.tiempo) {
+              <div class="activity-item">
+                <div class="activity-icon">
+                  <i class="pi" [class]="actividad.icono"></i>
+                </div>
+                <div class="activity-content">
+                  <p class="activity-message">{{ actividad.mensaje }}</p>
+                  <span class="activity-time">{{ actividad.tiempo }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Accesos Rápidos -->
+    <div class="card">
+      <div class="card-header">
+        <h3>
+          <i class="pi pi-th-large"></i>
+          Accesos Rápidos
+        </h3>
+      </div>
+      <div class="card-content">
+        <div class="quick-actions">
+          <a routerLink="/votantes/registro" class="quick-action">
+            <i class="pi pi-user-plus"></i>
+            <span>Registrar Votante</span>
+          </a>
+          <a routerLink="/confirmacion-votos" class="quick-action">
+            <i class="pi pi-check"></i>
+            <span>Confirmar Votos</span>
+          </a>
+          <a routerLink="/mensajes/enviar" class="quick-action">
+            <i class="pi pi-send"></i>
+            <span>Enviar Mensaje</span>
+          </a>
+          <a routerLink="/reportes" class="quick-action">
+            <i class="pi pi-file"></i>
+            <span>Generar Reporte</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertas -->
+  <div class="alerts-section">
+    <div class="alert alert-info">
+      <i class="pi pi-info-circle"></i>
+      <div>
+        <strong>Sistema Operativo</strong>
+        <p>El sistema electoral está funcionando correctamente.</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,132 @@
+<div class="login-container">
+  <!-- Partículas de fondo animadas -->
+  <div class="background-particles">
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+    <div class="bg-particle"></div>
+  </div>
+
+  <div class="login-card">
+    <!-- Logo Colombia Animado -->
+    <div class="logo-section">
+      <div class="logo-container">
+        <div class="particles-small">
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+        </div>
+        
+        <div class="flag-circle">
+          <div class="flag-stripe yellow"></div>
+          <div class="flag-stripe blue"></div>
+          <div class="flag-stripe red"></div>
+        </div>
+        
+        <div class="vote-icon">
+          <div class="ballot-box">
+            <div class="ballot-slot"></div>
+            <div class="checkmark">
+              <div class="checkmark-stem"></div>
+              <div class="checkmark-kick"></div>
+            </div>
+          </div>
+          <div class="vote-paper"></div>
+        </div>
+      </div>
+      
+      <h1>Sistema Electoral</h1>
+      <p class="subtitle">Colombia 🇨🇴</p>
+    </div>
+
+    <!-- Formulario de Login -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <h2>Iniciar Sesión</h2>
+
+      <!-- Mensaje de error -->
+      @if (error()) {
+        <div class="alert alert-error">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Campo Documento -->
+      <div class="form-group">
+        <label for="documento">
+          <i class="pi pi-id-card"></i>
+          Documento de Identidad
+        </label>
+        <input
+          type="text"
+          id="documento"
+          formControlName="documento"
+          placeholder="Ingrese su documento"
+          [class.invalid]="loginForm.get('documento')?.invalid && loginForm.get('documento')?.touched"
+        />
+        @if (loginForm.get('documento')?.invalid && loginForm.get('documento')?.touched) {
+          <small class="error-text">El documento es requerido (mínimo 6 dígitos)</small>
+        }
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <label for="password">
+          <i class="pi pi-lock"></i>
+          Contraseña
+        </label>
+        <div class="password-input-wrapper">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="Ingrese su contraseña"
+            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          />
+          <button 
+            type="button" 
+            class="toggle-password-btn"
+            (click)="togglePasswordVisibility()"
+            tabindex="-1"
+          >
+            <i [class]="showPassword() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+          </button>
+        </div>
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <small class="error-text">La contraseña es requerida (mínimo 6 caracteres)</small>
+        }
+      </div>
+
+      <!-- Recordar sesión y recuperar contraseña -->
+      <div class="form-options">
+        <a routerLink="/auth/forgot-password" class="forgot-link">
+          ¿Olvidó su contraseña?
+        </a>
+      </div>
+
+      <!-- Botón Submit -->
+      <button 
+        type="submit" 
+        class="btn-primary"
+        [disabled]="loginForm.invalid || loading()"
+      >
+        @if (loading()) {
+          <i class="pi pi-spin pi-spinner"></i>
+          Iniciando sesión...
+        } @else {
+          <i class="pi pi-sign-in"></i>
+          Iniciar Sesión
+        }
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>Sistema de Gestión Electoral</p>
+      <p class="version">Versión 1.0.0</p>
+    </div>
+  </div>
+</div>

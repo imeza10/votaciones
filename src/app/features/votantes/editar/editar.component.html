@@ -1,0 +1,264 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1><i class="pi pi-user-edit"></i> Editar Votante</h1>
+      <p class="subtitle">Modifique los datos del votante</p>
+    </div>
+    <button routerLink="/votantes/lista" class="btn-secondary">
+      <i class="pi pi-list"></i>
+      Volver a la Lista
+    </button>
+  </div>
+
+  @if (loading()) {
+    <app-loading />
+  } @else {
+    <form [formGroup]="votanteForm" (ngSubmit)="onSubmit()" class="votante-form">
+      <!-- Alertas -->
+      @if (success()) {
+        <div class="alert alert-success">
+          <i class="pi pi-check-circle"></i>
+          ¡Votante actualizado exitosamente! Redirigiendo...
+        </div>
+      }
+
+      @if (error()) {
+        <div class="alert alert-error">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Sección: Datos Personales -->
+      <div class="form-section">
+        <h2><i class="pi pi-id-card"></i> Datos Personales</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="documento">Documento <span class="required">*</span></label>
+            <input
+              type="text"
+              id="documento"
+              formControlName="documento"
+              placeholder="Número de documento"
+              [class.invalid]="votanteForm.get('documento')?.invalid && votanteForm.get('documento')?.touched"
+            />
+            @if (votanteForm.get('documento')?.hasError('required') && votanteForm.get('documento')?.touched) {
+              <small class="error-text">El documento es requerido</small>
+            }
+            @if (votanteForm.get('documento')?.hasError('minlength') && votanteForm.get('documento')?.touched) {
+              <small class="error-text">Mínimo 6 dígitos</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="nombres">Nombres <span class="required">*</span></label>
+            <input
+              type="text"
+              id="nombres"
+              formControlName="nombres"
+              placeholder="Nombres completos"
+              [class.invalid]="votanteForm.get('nombres')?.invalid && votanteForm.get('nombres')?.touched"
+            />
+            @if (votanteForm.get('nombres')?.invalid && votanteForm.get('nombres')?.touched) {
+              <small class="error-text">Los nombres son requeridos (mínimo 2 caracteres)</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="apellidos">Apellidos <span class="required">*</span></label>
+            <input
+              type="text"
+              id="apellidos"
+              formControlName="apellidos"
+              placeholder="Apellidos completos"
+              [class.invalid]="votanteForm.get('apellidos')?.invalid && votanteForm.get('apellidos')?.touched"
+            />
+            @if (votanteForm.get('apellidos')?.invalid && votanteForm.get('apellidos')?.touched) {
+              <small class="error-text">Los apellidos son requeridos (mínimo 2 caracteres)</small>
+            }
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input
+              type="tel"
+              id="telefono"
+              formControlName="telefono"
+              placeholder="3001234567"
+              [class.invalid]="votanteForm.get('telefono')?.invalid && votanteForm.get('telefono')?.touched"
+            />
+            @if (votanteForm.get('telefono')?.hasError('pattern') && votanteForm.get('telefono')?.touched) {
+              <small class="error-text">Teléfono inválido (7-10 dígitos)</small>
+            }
+          </div>
+
+          <div class="form-group full-width">
+            <label for="direccion">Dirección</label>
+            <input
+              type="text"
+              id="direccion"
+              formControlName="direccion"
+              placeholder="Dirección completa"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Ubicación -->
+      <div class="form-section">
+        <h2><i class="pi pi-map-marker"></i> Ubicación</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="departamento_id">Departamento <span class="required">*</span></label>
+            <select
+              id="departamento_id"
+              formControlName="departamento_id"
+              [class.invalid]="votanteForm.get('departamento_id')?.invalid && votanteForm.get('departamento_id')?.touched"
+            >
+              <option value="">Seleccione departamento</option>
+              @for (dep of departamentos(); track dep.id) {
+                <option [value]="dep.id">{{ dep.nombre }}</option>
+              }
+            </select>
+            @if (votanteForm.get('departamento_id')?.invalid && votanteForm.get('departamento_id')?.touched) {
+              <small class="error-text">El departamento es requerido</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="municipio_id">Municipio <span class="required">*</span></label>
+            <select
+              id="municipio_id"
+              formControlName="municipio_id"
+              [disabled]="!votanteForm.get('departamento_id')?.value"
+              [class.invalid]="votanteForm.get('municipio_id')?.invalid && votanteForm.get('municipio_id')?.touched"
+            >
+              <option value="">Seleccione municipio</option>
+              @for (mun of municipios(); track mun.id) {
+                <option [value]="mun.id">{{ mun.nombre }}</option>
+              }
+            </select>
+            @if (votanteForm.get('municipio_id')?.invalid && votanteForm.get('municipio_id')?.touched) {
+              <small class="error-text">El municipio es requerido</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="barrio_id">Barrio</label>
+            <select
+              id="barrio_id"
+              formControlName="barrio_id"
+              [disabled]="!votanteForm.get('municipio_id')?.value"
+            >
+              <option value="">Seleccione barrio</option>
+              @for (bar of barrios(); track bar.id) {
+                <option [value]="bar.id">{{ bar.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="comuna">Comuna</label>
+            <input
+              type="text"
+              id="comuna"
+              formControlName="comuna"
+              placeholder="Ej: Comuna 1"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="zona">Zona <span class="required">*</span></label>
+            <select id="zona" formControlName="zona">
+              <option value="urbana">Urbana</option>
+              <option value="rural">Rural</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Lugar de Votación -->
+      <div class="form-section">
+        <h2><i class="pi pi-building"></i> Lugar de Votación</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="lugar_votacion_id">Lugar de Votación</label>
+            <select
+              id="lugar_votacion_id"
+              formControlName="lugar_votacion_id"
+              [disabled]="!votanteForm.get('municipio_id')?.value"
+            >
+              <option value="">Seleccione lugar</option>
+              @for (lugar of lugaresVotacion(); track lugar.id) {
+                <option [value]="lugar.id">{{ lugar.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="mesa">Mesa</label>
+            <input
+              type="text"
+              id="mesa"
+              formControlName="mesa"
+              placeholder="Número de mesa"
+              [class.invalid]="votanteForm.get('mesa')?.invalid && votanteForm.get('mesa')?.touched"
+            />
+            @if (votanteForm.get('mesa')?.hasError('pattern') && votanteForm.get('mesa')?.touched) {
+              <small class="error-text">Solo números</small>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="es_jurado" class="checkbox-label">
+              <input
+                type="checkbox"
+                id="es_jurado"
+                formControlName="es_jurado"
+              />
+              <span>¿Es jurado de votación?</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Observaciones -->
+      <div class="form-section">
+        <h2><i class="pi pi-comment"></i> Observaciones</h2>
+        
+        <div class="form-group full-width">
+          <label for="observaciones">Observaciones Adicionales</label>
+          <textarea
+            id="observaciones"
+            formControlName="observaciones"
+            rows="4"
+            placeholder="Cualquier información adicional relevante..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancelar()">
+          <i class="pi pi-times"></i>
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="loading() || votanteForm.invalid">
+          @if (loading()) {
+            <i class="pi pi-spin pi-spinner"></i>
+          } @else {
+            <i class="pi pi-check"></i>
+          }
+          Actualizar Votante
+        </button>
+      </div>
+    </form>
+  }
+</div>
