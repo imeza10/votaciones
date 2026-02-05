@@ -17,10 +17,29 @@ body {
 
 /* Colombia Theme Colors */
 :root {
+  /* Colores Colombia */
   --colombia-yellow: #FCD116;
   --colombia-blue: #003893;
   --colombia-red: #CE1126;
   --dark-gray: #1a1a2e;
   --success-green: #4CAF50;
   --warning-orange: #FF9800;
+  
+  /* Colores del Sistema */
+  --primary-color: #003893;
+  --primary-color-dark: #002368;
+  --success-color: #4CAF50;
+  --warning-color: #FF9800;
+  --danger-color: #CE1126;
+  
+  /* Colores de Texto */
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  
+  /* Colores de Fondo */
+  --background-primary: #ffffff;
+  --background-secondary: #f8f9fa;
+  
+  /* Bordes */
+  --border-color: #e0e0e0;
 }

@@ -2,7 +2,7 @@
   <!-- Header con Estadísticas -->
   <div class="header-section">
     <h1>
-      <i class="icon-check"></i> Confirmación de Votos
+      <i class="pi pi-check-circle"></i> Confirmación de Votos
     </h1>
     
     <div class="stats-cards" *ngIf="estadisticas">
@@ -38,26 +38,26 @@
       class="tab" 
       [class.active]="vistaActual === 'pendientes'"
       (click)="cambiarVista('pendientes')">
-      <i class="icon-clock"></i> Pendientes
+      <i class="pi pi-clock"></i> Pendientes
     </button>
     <button 
       class="tab" 
       [class.active]="vistaActual === 'confirmados'"
       (click)="cambiarVista('confirmados')">
-      <i class="icon-check"></i> Confirmados
+      <i class="pi pi-check"></i> Confirmados
     </button>
     <button 
       class="tab" 
       [class.active]="vistaActual === 'todos'"
       (click)="cambiarVista('todos')">
-      <i class="icon-list"></i> Todos
+      <i class="pi pi-list"></i> Todos
     </button>
   </div>
 
   <!-- Filtros -->
   <div class="filters-section">
     <div class="search-box">
-      <i class="icon-search"></i>
+      <i class="pi pi-search"></i>
       <input 
         type="text" 
         [(ngModel)]="searchTerm" 
@@ -92,7 +92,7 @@
       
       <div class="filter-actions">
         <button class="btn btn-secondary" (click)="limpiarFiltros()">
-          <i class="icon-refresh"></i> Limpiar
+          <i class="pi pi-refresh"></i> Limpiar
         </button>
       </div>
     </div>
@@ -126,7 +126,7 @@
         <tr *ngIf="!loading && votantes.length === 0">
           <td colspan="8" class="text-center">
             <div class="empty-state">
-              <i class="icon-inbox"></i>
+              <i class="pi pi-inbox"></i>
               <p>No se encontraron votantes</p>
             </div>
           </td>
@@ -148,8 +148,8 @@
               'badge-warning': !votante.confirmado
             }">
               <i [class]="votante.confirmado ? 
-                         (votante.voto ? 'icon-check' : 'icon-x') : 
-                         'icon-clock'"></i>
+                         (votante.voto ? 'pi pi-check' : 'pi pi-times') : 
+                         'pi pi-clock'"></i>
               {{ votante.confirmado ? 
                  (votante.voto ? 'Votó a Favor' : 'No Votó') : 
                  'Pendiente' }}
@@ -164,7 +164,7 @@
               [ngClass]="votante.confirmado ? 'btn-secondary' : 'btn-primary'"
               (click)="abrirModalConfirmacion(votante)"
               [title]="votante.confirmado ? 'Editar confirmación' : 'Confirmar voto'">
-              <i [class]="votante.confirmado ? 'icon-edit' : 'icon-check'"></i>
+              <i [class]="votante.confirmado ? 'pi pi-pencil' : 'pi pi-check'"></i>
               {{ votante.confirmado ? 'Editar' : 'Confirmar' }}
             </button>
           </td>
@@ -179,7 +179,7 @@
       class="btn btn-sm btn-secondary" 
       [disabled]="pagination.current_page === 1"
       (click)="cambiarPagina(pagination.current_page - 1)">
-      <i class="icon-arrow-left"></i> Anterior
+      <i class="pi pi-arrow-left"></i> Anterior
     </button>
     
     <div class="page-numbers">
@@ -196,7 +196,7 @@
       class="btn btn-sm btn-secondary" 
       [disabled]="pagination.current_page === pagination.total_pages"
       (click)="cambiarPagina(pagination.current_page + 1)">
-      Siguiente <i class="icon-arrow-right"></i>
+      Siguiente <i class="pi pi-arrow-right"></i>
     </button>
     
     <span class="pagination-info">
@@ -211,11 +211,11 @@
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h2>
-        <i class="icon-check-circle"></i>
+        <i class="pi pi-check-circle"></i>
         {{ votanteAConfirmar?.confirmado ? 'Editar' : 'Confirmar' }} Voto
       </h2>
       <button class="close-btn" (click)="cerrarModal()">
-        <i class="icon-x"></i>
+        <i class="pi pi-times"></i>
       </button>
     </div>
     
@@ -237,7 +237,7 @@
               [value]="true" 
               [(ngModel)]="confirmacionVoto">
             <span class="vote-label success">
-              <i class="icon-check"></i> Sí, votó a favor
+              <i class="pi pi-check"></i> Sí, votó a favor
             </span>
           </label>
           
@@ -248,7 +248,7 @@
               [value]="false" 
               [(ngModel)]="confirmacionVoto">
             <span class="vote-label danger">
-              <i class="icon-x"></i> No votó
+              <i class="pi pi-times"></i> No votó
             </span>
           </label>
         </div>
@@ -268,7 +268,7 @@
         Cancelar
       </button>
       <button class="btn btn-primary" (click)="confirmarVoto()" [disabled]="loading">
-        <i class="icon-save"></i>
+        <i class="pi pi-save"></i>
         {{ loading ? 'Guardando...' : 'Confirmar' }}
       </button>
     </div>

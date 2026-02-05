@@ -75,12 +75,19 @@ Electoral management system for Colombian political campaigns allowing multiple 
   - Backend API con roles y jerarquías
   - Frontend con interfaces separadas por rol
   - Sistema de validaciones y permisos
+- **Módulo de Confirmación de Votos**: Sistema completo (Ver MODULO_CONFIRMACION_COMPLETADO.md)
+  - Backend API con 4 endpoints (listar, confirmar, actualizar, estadísticas)
+  - Frontend con tres vistas (pendientes, confirmados, todos)
+  - Dashboard de estadísticas en tiempo real
+  - Modal de confirmación interactivo
+  - Filtros avanzados y búsqueda
+  - Sistema de badges con códigos de color
 
 ### 🚀 Próximos Pasos
 1. ✅ Implementar CRUD completo de Votantes - **COMPLETADO**
 2. ✅ Implementar gestión de Usuarios (Coordinadores, Líderes, Digitadores) - **COMPLETADO**
-3. Sistema de Confirmación de Votos en tiempo real - **SIGUIENTE**
-4. Integración de autenticación JWT completa
+3. ✅ Sistema de Confirmación de Votos en tiempo real - **COMPLETADO**
+4. Integración de autenticación JWT completa - **SIGUIENTE**
 5. Sistema de mensajería SMS/WhatsApp
 6. Gestión de Transportes
 7. Control de Gastos

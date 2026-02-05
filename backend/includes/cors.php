@@ -8,7 +8,8 @@
 $allowed_origins = [
     'https://imc-st.com',
     'http://localhost:4200',
-    'http://localhost:4201'
+    'http://localhost:4201',
+    'http://localhost:4202'
 ];
 
 // Obtener el origen de la petición
@@ -19,7 +20,7 @@ if (in_array($origin, $allowed_origins)) {
     header("Access-Control-Allow-Origin: $origin");
 } else {
     // Por defecto permitir localhost para desarrollo
-    if (strpos($origin, 'localhost') !== false) {
+    if (strpos($origin, 'localhost') !== false || strpos($origin, '127.0.0.1') !== false) {
         header("Access-Control-Allow-Origin: $origin");
     }
 }
